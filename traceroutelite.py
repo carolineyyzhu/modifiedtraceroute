@@ -1,5 +1,6 @@
 import time
 import socket
+import struct
 
 def read_file_for_websites(filename):
     with open(filename) as filereader:
@@ -32,17 +33,19 @@ def run_simplified_traceroute(website):
     payload = bytes(msg + 'a' * (1472 - len(msg)), 'ascii')
 
     # start timer
-    time_at_send = time.clock_gettime_ns()
+    time_at_send = time.perf_counter()
     send_sock.sendto(payload, (dest_ip, dest_port))
 
     icmp_packet = recv_sock.recv(1500)
-    time_at_receive = time.clock_gettime_ns()
+    time_at_receive = time.perf_counter()
     return_time_nanoseconds = time_at_receive - time_at_send
     print('Return time' + str(return_time_nanoseconds))
 
     print('ICMP packet length: ' + str(icmp_packet.__len__()))
     # Check to see if IP address matches
-    icmp_packet_ip_address = 0
+    icmp_packet_ip_address = struct.unpack("!hhhh", icmp_packet[44:48])
+    ip_match = icmp_packet_ip_address == dest_ip
+    print(icmp_packet_ip_address + " ip, + " + str(ip_match))
 
     # Check to see if port number matches
 
