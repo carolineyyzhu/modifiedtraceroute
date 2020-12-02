@@ -34,7 +34,7 @@ def read_file_for_websites(filename):
     return website_list
 
 #runs a trace along the website provided as an argument; tracks the RTT and the number of hops
-def simplified_traceroute_instance(website):
+def simplified_traceroute_instance(website, failed_flag):
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     recv_sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
@@ -64,7 +64,10 @@ def simplified_traceroute_instance(website):
     select_timeout = select.select([recv_sock], [], [], 10)
     if not select_timeout[0]:
         print("This website: " + website + " timed out and failed to respond")
-        return -1
+        if failed_flag >= 0:
+            return simplified_traceroute_instance(website, failed_flag - 1)
+        else:
+            return -1
 
     icmp_packet = recv_sock.recv(1500)
     #stop timer, calculate RTT here
@@ -102,7 +105,8 @@ def run_simplified_traceroute():
         column_names = ['Website', 'RTT', 'Hops']
         csv_writer = csv.DictWriter(csv_file, column_names)
         for i in range(len(website_list)):
-            if(simplified_traceroute_instance(website_list[i]) == 1):
+            #can fail 3 times until done
+            if(simplified_traceroute_instance(website_list[i], 3) == 1):
                 csv_writer.writerow({'Website' : website_list[i], 'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
             else:
                 rtt_list.append(0)
