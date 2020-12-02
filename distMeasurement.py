@@ -9,6 +9,7 @@ port_nums_in_use = []
 rtt_list = []
 hops_list = []
 
+#function to check that the port number assigned is unique and is an ephemeral port number
 def generate_random_port_num():
     port_num_found = False
     port_num = 0
@@ -19,6 +20,8 @@ def generate_random_port_num():
             port_nums_in_use.append(port_num)
     return port_num
 
+#reads the file targets.txt for website names separated by "\n", where the last line does not have a newline after it
+#returns a list of website names to trace
 def read_file_for_websites(filename):
     with open(filename) as filereader:
         file_strip = filereader.readlines()
@@ -30,15 +33,19 @@ def read_file_for_websites(filename):
             website_list.append(line)
     return website_list
 
+#runs a trace along the website provided as an argument; tracks the RTT and the number of hops
 def simplified_traceroute_instance(website):
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     recv_sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+
+    #setting up the sending socket with IP address and port number
     source_ip = socket.gethostname()
     # ephemeral port number assigned to source port
     source_port = generate_random_port_num()
     send_sock.bind((source_ip, source_port))
 
+    #destination IP from the website name; destination port is one that is meant to take in misc. requests
     dest_ip = socket.gethostbyname(website)
     dest_port = 33434
 
@@ -53,13 +60,14 @@ def simplified_traceroute_instance(website):
     time_at_send = time.perf_counter()
     send_sock.sendto(payload, (dest_ip, dest_port))
 
-    #Wait 5 seconds to time out
-    select_timeout = select.select([recv_sock], [], [], 2)
+    #Wait 10 seconds to time out
+    select_timeout = select.select([recv_sock], [], [], 10)
     if not select_timeout[0]:
         print("This website: " + website + " timed out and failed to respond")
         return -1
 
     icmp_packet = recv_sock.recv(1500)
+    #stop timer, calculate RTT here
     time_at_receive = time.perf_counter()
     return_time_milliseconds = (time_at_receive - time_at_send) / 1000
 
@@ -87,6 +95,7 @@ def simplified_traceroute_instance(website):
     recv_sock.close()
     return 1
 
+#overall function to run traceroute, including writing to a separate CSV file the findings from this traceroute run.
 def run_simplified_traceroute():
     website_list = read_file_for_websites("targets.txt")
     with open("results.csv", mode='w') as csv_file:
