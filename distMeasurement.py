@@ -3,6 +3,7 @@ import time
 import socket
 import struct
 import select
+import csv
 
 port_nums_in_use = []
 
@@ -25,9 +26,14 @@ def read_file_for_websites(filename):
             website_list.append(line[:len(line) - 1])
         else:
             website_list.append(line)
-    print(website_list)
+    return website_list
 
-def run_simplified_traceroute(website):
+def write_to_file_results(filename, rtt, hops):
+    with open(filename, mode='w') as csv_file:
+        csv_writer = csv.writer(csv_file)
+
+
+def simplified_traceroute_instance(website):
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     recv_sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     recv_sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
@@ -35,7 +41,6 @@ def run_simplified_traceroute(website):
     # ephemeral port number assigned to source port
     source_port = generate_random_port_num()
     send_sock.bind((source_ip, source_port))
-    print("source port" + str(source_port))
 
     dest_ip = socket.gethostbyname(website)
     dest_port = 33434
@@ -72,14 +77,22 @@ def run_simplified_traceroute(website):
     # Check to see if port number matches
     icmp_packet_port_number_tuple = struct.unpack("!BB", icmp_packet[48:50])
     icmp_packet_port_number = (icmp_packet_port_number_tuple[0] << 8) + icmp_packet_port_number_tuple[1]
-    print(icmp_packet_port_number)
     port_number_match = icmp_packet_port_number == source_port
 
     return_ttl = icmp_packet[36]
     hops_taken = ttl - return_ttl
 
     print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + str(ip_match) + ". The returned packet matched the port number correctly: " + str(port_number_match))
+
     send_sock.close()
     recv_sock.close()
 
-run_simplified_traceroute("www.google.com")
+    write_to_file_results("results.csv", return_time_milliseconds, hops_taken)
+
+def run_simplified_traceroute():
+    website_list = read_file_for_websites("targets.txt")
+    write_to_file_results("results.csv", "RTT", "Hops")
+    for website in website_list:
+        simplified_traceroute_instance(website)
+
+run_simplified_traceroute()
