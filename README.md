@@ -4,5 +4,5 @@ Lightweight traceroute tool that measures the number of hops and the RTT of a pa
 
 To run the program, use 'python3 distMeasurement.py'
 
-##### On the eecslab-10 remote machine, file locations are as follows:
+#### On the VM, file locations are as follows:
 - **Location of source code:** /home/eecs-user/project2grading/
