@@ -90,13 +90,14 @@ def simplified_traceroute_instance(website):
 def run_simplified_traceroute():
     website_list = read_file_for_websites("targets.txt")
     with open("results.csv", mode='w') as csv_file:
-        column_names = ['RTT', 'Hops']
+        column_names = ['Website', 'RTT', 'Hops']
         csv_writer = csv.DictWriter(csv_file, column_names)
         for i in range(len(website_list)):
             if(simplified_traceroute_instance(website_list[i]) == 1):
-                csv_writer.writerow({'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
+                csv_writer.writerow({'Website' : website_list[i], 'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
             else:
                 rtt_list.append(0)
                 hops_list.append(0)
+                csv_writer.writerow({'Website' : website_list[i], 'RTT': 'Timeout', 'Hops': 'Timeout'})
 
 run_simplified_traceroute()
