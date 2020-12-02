@@ -43,11 +43,10 @@ def run_simplified_traceroute(website):
 
     print('ICMP packet length: ' + str(icmp_packet.__len__()))
     # Check to see if IP address matches
-    icmp_packet_ip_test = icmp_packet[44:48]
-    print(icmp_packet_ip_test)
-    # icmp_packet_ip_address = struct.unpack("!hhhh", icmp_packet[44:48])
-    # ip_match = icmp_packet_ip_address == dest_ip
-    # print(icmp_packet_ip_address + " ip, + " + str(ip_match))
+
+    icmp_packet_ip_address = struct.unpack("!hhh", icmp_packet[44:48])
+    ip_match = icmp_packet_ip_address == dest_ip
+    print(icmp_packet_ip_address + " ip, + " + str(ip_match))
 
     # Check to see if port number matches
 
