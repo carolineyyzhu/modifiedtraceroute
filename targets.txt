@@ -3,9 +3,11 @@ www.facebook.com
 fudan.edu.cn
 marmara.edu.tr
 www.latimes.com
-www.uchicago.edu
-www.harvard.edu
 www.princeton.edu
 www.yale.edu
 home.dartmouth.edu
 www.cornell.edu
+www.umich.edu
+www.ucla.edu
+www.stanford.edu
+www.upenn.edu
