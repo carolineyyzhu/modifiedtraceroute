@@ -58,6 +58,4 @@ def run_simplified_traceroute(website):
     send_sock.close()
     recv_sock.close()
 
-icmp_packet_ip_address_tuple = (127, 21, 0, 1)
-
-print(icmp_packet_ip_address)
+run_simplified_traceroute("www.google.com")
