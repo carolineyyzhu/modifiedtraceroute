@@ -32,11 +32,11 @@ def run_simplified_traceroute(website):
     payload = bytes(msg + 'a' * (1472 - len(msg)), 'ascii')
 
     # start timer
-    time_at_send = time.perf_counter_ns()
+    time_at_send = time.clock_gettime_ns()
     send_sock.sendto(payload, (dest_ip, dest_port))
 
     icmp_packet = recv_sock.recv(1500)
-    time_at_receive = time.perf_counter_ns()
+    time_at_receive = time.clock_gettime_ns()
     return_time_nanoseconds = time_at_receive - time_at_send
     print('Return time' + str(return_time_nanoseconds))
 
