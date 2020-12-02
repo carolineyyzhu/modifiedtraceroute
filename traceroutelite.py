@@ -45,7 +45,11 @@ def run_simplified_traceroute(website):
     print('ICMP packet length: ' + str(icmp_packet.__len__()))
     # Check to see if IP address matches
 
-    icmp_packet_ip_address = struct.unpack("!BBBB", icmp_packet[44:48])
+    icmp_packet_ip_address_tuple = struct.unpack("!BBBB", icmp_packet[44:48])
+    icmp_packet_ip_address = ""
+    for ip_segment in icmp_packet_ip_address_tuple:
+        icmp_packet_ip_address = icmp_packet_ip_address + str(ip_segment) + "."
+    icmp_packet_ip_address = icmp_packet_ip_address[:len(icmp_packet_ip_address) - 1]
     ip_match = icmp_packet_ip_address == dest_ip
     print(icmp_packet_ip_address + " ip, + " + str(ip_match))
 
@@ -54,4 +58,6 @@ def run_simplified_traceroute(website):
     send_sock.close()
     recv_sock.close()
 
-run_simplified_traceroute("www.google.com")
+icmp_packet_ip_address_tuple = (127, 21, 0, 1)
+
+print(icmp_packet_ip_address)
