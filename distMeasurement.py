@@ -31,7 +31,7 @@ def read_file_for_websites(filename):
 def write_to_file_results(filename, rtt, hops):
     with open(filename, mode='w') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow({'rtt' : rtt, 'hops' : hops})
+        csv_writer.writerow({'rtt': str(rtt), 'hops' : str(hops)})
 
 
 def simplified_traceroute_instance(website):
@@ -84,11 +84,11 @@ def simplified_traceroute_instance(website):
     hops_taken = ttl - return_ttl
 
     print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + str(ip_match) + ". The returned packet matched the port number correctly: " + str(port_number_match))
+    write_to_file_results("results.csv", return_time_milliseconds, hops_taken)
 
     send_sock.close()
     recv_sock.close()
 
-    write_to_file_results("results.csv", return_time_milliseconds, hops_taken)
 
 def run_simplified_traceroute():
     website_list = read_file_for_websites("targets.txt")
