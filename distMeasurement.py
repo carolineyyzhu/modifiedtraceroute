@@ -64,9 +64,11 @@ def simplified_traceroute_instance(website, failed_flag):
     select_timeout = select.select([recv_sock], [], [], 10)
     if not select_timeout[0]:
         print("This website: " + website + " timed out and failed to respond")
-        if failed_flag >= 0:
+        if failed_flag > 0:
+            print("Re-running trace to " + website + "...")
             return simplified_traceroute_instance(website, failed_flag - 1)
         else:
+            print("This website: " + website + " has timed out multiple times. Failure.")
             return -1
 
     icmp_packet = recv_sock.recv(1500)
