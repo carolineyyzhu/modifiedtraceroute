@@ -31,6 +31,7 @@ def read_file_for_websites(filename):
 def write_to_file_results(filename, rtt, hops):
     with open(filename, mode='w') as csv_file:
         csv_writer = csv.writer(csv_file)
+        csv_writer.writerow({'rtt' : rtt, 'hops' : hops})
 
 
 def simplified_traceroute_instance(website):
