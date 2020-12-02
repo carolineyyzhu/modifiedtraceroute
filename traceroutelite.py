@@ -1,4 +1,4 @@
-import datetime
+import time
 import socket
 
 def read_file_for_websites(filename):
@@ -32,14 +32,15 @@ def run_simplified_traceroute(website):
     payload = bytes(msg + 'a' * (1472 - len(msg)), 'ascii')
 
     # start timer
-    time_at_send = datetime.timedelta.total_seconds()
+    time_at_send = time.perf_counter_ns()
     send_sock.sendto(payload, (dest_ip, dest_port))
 
     icmp_packet = recv_sock.recv(1500)
-    time_at_receive = datetime.timedelta.total_seconds()
-    return_time_milliseconds = (time_at_receive - time_at_send) * 1000
+    time_at_receive = time.perf_counter_ns()
+    return_time_nanoseconds = time_at_receive - time_at_send
+    print('Return time' + str(return_time_nanoseconds))
 
-    print(icmp_packet.__len__())
+    print('ICMP packet length: ' + str(icmp_packet.__len__()))
     # Check to see if IP address matches
     icmp_packet_ip_address = 0
 
