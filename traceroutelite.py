@@ -2,6 +2,7 @@ import random
 import time
 import socket
 import struct
+import select
 
 port_nums_in_use = []
 
@@ -50,12 +51,15 @@ def run_simplified_traceroute(website):
     time_at_send = time.perf_counter()
     send_sock.sendto(payload, (dest_ip, dest_port))
 
+    #Wait 5 seconds to time out
+    poll_list = select.poll().poll(5000)
+    if not poll_list:
+        print("This site timed out.")
+        return
+
     icmp_packet = recv_sock.recv(1500)
     time_at_receive = time.perf_counter()
-    return_time_nanoseconds = time_at_receive - time_at_send
-    print('Return time' + str(return_time_nanoseconds))
-
-    print('ICMP packet length: ' + str(icmp_packet.__len__()))
+    return_time_milliseconds = (time_at_receive - time_at_send) / 1000
 
     # Check to see if IP address matches
     icmp_packet_ip_address_tuple = struct.unpack("!BBBB", icmp_packet[44:48])
@@ -66,11 +70,14 @@ def run_simplified_traceroute(website):
     ip_match = icmp_packet_ip_address == dest_ip
 
     # Check to see if port number matches
-    icmp_packet_port_number = struct.unpack("!BBBB", icmp_packet[50:52])
-    print(icmp_packet_port_number)
+    icmp_packet_port_number_tuple = struct.unpack("!BB", icmp_packet[48:50])
+    icmp_packet_port_number = bin((icmp_packet_port_number_tuple[0] << 8) + icmp_packet_port_number_tuple[1])
+    port_number_match = icmp_packet_port_number == source_port
 
+    return_ttl = icmp_packet[36]
+    hops_taken = ttl - return_ttl
+
+    print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + ip_match + ". The returned packet matched the port number correctly: " + port_number_match)
     send_sock.close()
     recv_sock.close()
-
-run_simplified_traceroute("www.google.com")
 
