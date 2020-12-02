@@ -52,9 +52,9 @@ def run_simplified_traceroute(website):
     send_sock.sendto(payload, (dest_ip, dest_port))
 
     #Wait 5 seconds to time out
-    poll_list = select.poll().poll(5000)
-    if not poll_list:
-        print("This site timed out.")
+    select_timeout = select.select([recv_sock], [], [], 2)
+    if not select_timeout[0]:
+        print("This website timed out and failed to respond")
         return
 
     icmp_packet = recv_sock.recv(1500)
