@@ -72,12 +72,13 @@ def run_simplified_traceroute(website):
     # Check to see if port number matches
     icmp_packet_port_number_tuple = struct.unpack("!BB", icmp_packet[48:50])
     icmp_packet_port_number = bin((icmp_packet_port_number_tuple[0] << 8) + icmp_packet_port_number_tuple[1])
+    print(icmp_packet_port_number)
     port_number_match = icmp_packet_port_number == source_port
 
     return_ttl = icmp_packet[36]
     hops_taken = ttl - return_ttl
 
-    print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + ip_match + ". The returned packet matched the port number correctly: " + port_number_match)
+    print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + str(ip_match) + ". The returned packet matched the port number correctly: " + str(port_number_match))
     send_sock.close()
     recv_sock.close()
 
