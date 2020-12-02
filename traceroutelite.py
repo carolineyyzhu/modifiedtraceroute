@@ -81,3 +81,4 @@ def run_simplified_traceroute(website):
     send_sock.close()
     recv_sock.close()
 
+run_simplified_traceroute("www.google.com")
