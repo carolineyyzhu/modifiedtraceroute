@@ -1,6 +1,19 @@
+import random
 import time
 import socket
 import struct
+
+port_nums_in_use = []
+
+def generate_random_port_num():
+    port_num_found = False
+    port_num = 0
+    while not port_num_found:
+        port_num = random.randrange(49152, 65535)
+        if not port_num in port_nums_in_use:
+            port_num_found = True
+            port_nums_in_use.append(port_num)
+    return port_num
 
 def read_file_for_websites(filename):
     with open(filename) as filereader:
@@ -19,8 +32,8 @@ def run_simplified_traceroute(website):
     recv_sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
     source_ip = socket.gethostname()
     # ephemeral port number assigned to source port
-    # source_port = 49152
-    # send_sock.bind((source_ip, source_port))
+    source_port = generate_random_port_num()
+    send_sock.bind((source_ip, source_port))
 
     dest_ip = socket.gethostbyname(website)
     print(dest_ip)
@@ -59,3 +72,4 @@ def run_simplified_traceroute(website):
     recv_sock.close()
 
 run_simplified_traceroute("www.google.com")
+
