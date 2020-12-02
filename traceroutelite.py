@@ -34,9 +34,9 @@ def run_simplified_traceroute(website):
     # ephemeral port number assigned to source port
     source_port = generate_random_port_num()
     send_sock.bind((source_ip, source_port))
+    print("source port" + str(source_port))
 
     dest_ip = socket.gethostbyname(website)
-    print(dest_ip)
     dest_port = 33434
 
     # initial ttl value of 64
@@ -56,17 +56,18 @@ def run_simplified_traceroute(website):
     print('Return time' + str(return_time_nanoseconds))
 
     print('ICMP packet length: ' + str(icmp_packet.__len__()))
-    # Check to see if IP address matches
 
+    # Check to see if IP address matches
     icmp_packet_ip_address_tuple = struct.unpack("!BBBB", icmp_packet[44:48])
     icmp_packet_ip_address = ""
     for ip_segment in icmp_packet_ip_address_tuple:
         icmp_packet_ip_address = icmp_packet_ip_address + str(ip_segment) + "."
     icmp_packet_ip_address = icmp_packet_ip_address[:len(icmp_packet_ip_address) - 1]
     ip_match = icmp_packet_ip_address == dest_ip
-    print(icmp_packet_ip_address + " ip, + " + str(ip_match))
 
     # Check to see if port number matches
+    icmp_packet_port_number = struct.unpack("!BBBB", icmp_packet[50:52])
+    print(icmp_packet_port_number)
 
     send_sock.close()
     recv_sock.close()
