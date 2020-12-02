@@ -6,6 +6,8 @@ import select
 import csv
 
 port_nums_in_use = []
+rtt_list = []
+hops_list = []
 
 def generate_random_port_num():
     port_num_found = False
@@ -27,12 +29,6 @@ def read_file_for_websites(filename):
         else:
             website_list.append(line)
     return website_list
-
-def write_to_file_results(filename, rtt, hops):
-    with open(filename, mode='w') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow({'rtt': str(rtt), 'hops' : str(hops)})
-
 
 def simplified_traceroute_instance(website):
     send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -84,7 +80,8 @@ def simplified_traceroute_instance(website):
     hops_taken = ttl - return_ttl
 
     print("It took " + str(hops_taken) + " hops to reach " + website + ". The RTT was " + str(return_time_milliseconds) + " milliseconds.\nThe returned packet matched the IP address correctly: " + str(ip_match) + ". The returned packet matched the port number correctly: " + str(port_number_match))
-    write_to_file_results("results.csv", return_time_milliseconds, hops_taken)
+    rtt_list.append(return_time_milliseconds)
+    hops_list.append(hops_taken)
 
     send_sock.close()
     recv_sock.close()
@@ -92,8 +89,11 @@ def simplified_traceroute_instance(website):
 
 def run_simplified_traceroute():
     website_list = read_file_for_websites("targets.txt")
-    write_to_file_results("results.csv", "RTT", "Hops")
-    for website in website_list:
-        simplified_traceroute_instance(website)
+    with open("results.csv", mode='w') as csv_file:
+        column_names = ['RTT', 'Hops']
+        csv_writer = csv.DictWriter(csv_file, column_names)
+        for i in range(len(website_list)):
+            simplified_traceroute_instance(website_list[i])
+            csv_writer.writerow({'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
 
 run_simplified_traceroute()
