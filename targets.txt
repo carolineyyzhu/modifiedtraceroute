@@ -4,10 +4,9 @@ fudan.edu.cn
 marmara.edu.tr
 www.latimes.com
 www.princeton.edu
-www.yale.edu
 home.dartmouth.edu
 www.cornell.edu
 www.umich.edu
-www.ucla.edu
-www.stanford.edu
-www.upenn.edu
+www.northeastern.edu
+www.wisc.edu
+www.cmu.edu
