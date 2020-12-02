@@ -23,6 +23,7 @@ def run_simplified_traceroute(website):
     # send_sock.bind((source_ip, source_port))
 
     dest_ip = socket.gethostbyname(website)
+    print(dest_ip)
     dest_port = 33434
 
     # initial ttl value of 64
@@ -44,7 +45,7 @@ def run_simplified_traceroute(website):
     print('ICMP packet length: ' + str(icmp_packet.__len__()))
     # Check to see if IP address matches
 
-    icmp_packet_ip_address = struct.unpack("!hhh", icmp_packet[44:48])
+    icmp_packet_ip_address = struct.unpack("!BBBB", icmp_packet[44:48])
     ip_match = icmp_packet_ip_address == dest_ip
     print(icmp_packet_ip_address + " ip, + " + str(ip_match))
 
