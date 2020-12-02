@@ -57,7 +57,7 @@ def simplified_traceroute_instance(website):
     select_timeout = select.select([recv_sock], [], [], 2)
     if not select_timeout[0]:
         print("This website: " + website + " timed out and failed to respond")
-        return
+        return -1
 
     icmp_packet = recv_sock.recv(1500)
     time_at_receive = time.perf_counter()
@@ -85,7 +85,7 @@ def simplified_traceroute_instance(website):
 
     send_sock.close()
     recv_sock.close()
-
+    return 1
 
 def run_simplified_traceroute():
     website_list = read_file_for_websites("targets.txt")
@@ -93,7 +93,10 @@ def run_simplified_traceroute():
         column_names = ['RTT', 'Hops']
         csv_writer = csv.DictWriter(csv_file, column_names)
         for i in range(len(website_list)):
-            simplified_traceroute_instance(website_list[i])
-            csv_writer.writerow({'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
+            if(simplified_traceroute_instance(website_list[i]) == 1):
+                csv_writer.writerow({'RTT': str(rtt_list[i]), 'Hops': str(hops_list[i])})
+            else:
+                rtt_list.append(0)
+                hops_list.append(0)
 
 run_simplified_traceroute()
